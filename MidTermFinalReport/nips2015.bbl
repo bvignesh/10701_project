@@ -1,0 +1,33 @@
+\begin{thebibliography}{1}
+
+\bibitem{eeglab}
+A.~Delorme, G.~A. Rousselet, M.~J.-M. Mac{\'e}, and M.~Fabre-Thorpe.
+\newblock Interaction of top-down and bottom-up processing in the fast visual
+  analysis of natural scenes.
+\newblock {\em Cognitive Brain Research}, 19(2):103--113, 2004.
+
+\bibitem{review}
+F.~Lotte, M.~Congedo, A.~L{\'e}cuyer, F.~Lamarche, and B.~Arnaldi.
+\newblock A review of classification algorithms for eeg-based brain--computer
+  interfaces.
+\newblock {\em Journal of neural engineering}, 4(2):R1, 2007.
+
+\bibitem{luck2005}
+S.~J. Luck.
+\newblock An introduction to the event-related potential technique.
+\newblock {\em MIT Press}, 2005.
+
+\bibitem{Onton2006808}
+J.~Onton, M.~Westerfield, J.~Townsend, and S.~Makeig.
+\newblock Imaging human \{EEG\} dynamics using independent component analysis.
+\newblock {\em Neuroscience & Biobehavioral Reviews}, 30(6):808 -- 822, 2006.
+\newblock Methodological and Conceptual Advances in the Study of Brain-Behavior
+  Dynamics: A Multivariate Lifespan Perspective.
+
+\bibitem{Stewart20141}
+A.~X. Stewart, A.~Nuthmann, and G.~Sanguinetti.
+\newblock Single-trial classification of \{EEG\} in a visual object task using
+  \{ICA\} and machine learning.
+\newblock {\em Journal of Neuroscience Methods}, 228:1 -- 14, 2014.
+
+\end{thebibliography}
