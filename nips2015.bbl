@@ -1,3 +1,9 @@
-\begin{thebibliography}{}
+\begin{thebibliography}{1}
+
+\bibitem{eeglab}
+A.~Delorme, G.~A. Rousselet, M.~J.-M. Mac{\'e}, and M.~Fabre-Thorpe.
+\newblock Interaction of top-down and bottom-up processing in the fast visual
+  analysis of natural scenes.
+\newblock {\em Cognitive Brain Research}, 19(2):103--113, 2004.
 
 \end{thebibliography}
