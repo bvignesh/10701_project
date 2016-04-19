@@ -59,6 +59,8 @@ for k = 1:length(subjects)
         class_full = [];
         for i = 1:size(data,1)
             %% SVM Variables
+            Group = [];
+            Training = [];
             Group1 = [];
             Training1 = [];  % this is for classifying between no stim and the rest
 	    Group2 = [];
@@ -67,6 +69,8 @@ for k = 1:length(subjects)
             Training3 = [];  % for classifying between correct distractor and the rest
 	    %% Filter Stuff correct_distractor
             [ SVMdata, SVMclass ] = svm_data_get_filtered( no_stimulus, chunk_size, 1);
+            Training = [Training; SVMdata];
+            Group = [Group; SVMclass];
             Training1 = [Training1; SVMdata];
             Group1 = [Group1; SVMclass];
 	    Training2 = [Training2; SVMdata];
@@ -74,6 +78,8 @@ for k = 1:length(subjects)
 	    Training3 = [Training3; SVMdata];
             Group3 = [Group3; SVMclass - 1];
 	    [ SVMdata, SVMclass ] = svm_data_get_filtered( correct_target_data(i,:), chunk_size, 2);
+            Training = [Training; SVMdata];
+            Group = [Group; SVMclass];
             Training2 = [Training2; SVMdata];
             Group2 = [Group2; SVMclass];
             Training1 = [Training1; SVMdata];
@@ -81,6 +87,8 @@ for k = 1:length(subjects)
             Training3 = [Training3; SVMdata];
             Group3 = [Group3; SVMclass - 2];
             [ SVMdata, SVMclass ] = svm_data_get_filtered( correct_distractor_data(i,:), chunk_size, 3);
+            Training = [Training; SVMdata];
+            Group = [Group; SVMclass];
             Training3 = [Training3; SVMdata];
             Group3 = [Group3; SVMclass];
 	    Training2 = [Training2; SVMdata];
@@ -92,23 +100,63 @@ for k = 1:length(subjects)
 	    SVMStruct2 = svmtrain(Training2(1:2:end,:),Group2(1:2:end,:), 'kernel_function', 'rbf', 'rbf_sigma' , 1, 'boxconstraint', 1);
 	    SVMStruct3 = svmtrain(Training3(1:2:end,:),Group3(1:2:end,:), 'kernel_function', 'rbf', 'rbf_sigma' , 1, 'boxconstraint', 1);
             %% Check Trained SVM on test data
-            ClassifiedGroup1 = svmclassify(SVMStruct1,Training1(2:2:end,:));
-            ClassifiedGroup2 = svmclassify(SVMStruct2,Training2(2:2:end,:));
-	    ClassifiedGroup3 = svmclassify(SVMStruct3,Training3(2:2:end,:));
-	    %%Write to output files
-	    output_filename1='svm_out1';
-	    output_filename2='svm_out2';
-	    output_filename3='svm_out3';
-	    save(output_filename1,'SVMStruct1');
-	    save(output_filename2,'SVMStruct2');
-	    save(output_filename3,'SVMStruct3');
-	    %%Measure Accuracy
-	    correct1 = find(ClassifiedGroup1 == Group1(2:2:end,:));
-	    error_rate1 = 1 - (length(correct1)/length(ClassifiedGroup1));
-            correct2 = find(ClassifiedGroup2 == Group2(2:2:end,:));
-	    error_rate2 = 1 - (length(correct2)/length(ClassifiedGroup2));
-	    correct3 = find(ClassifiedGroup3 == Group3(2:2:end,:));
-            error_rate3 = 1 - (length(correct3)/length(ClassifiedGroup3));
-	end
-     end
-  end
+            ClassifiedGroup1 = svmclassify(SVMStruct1,Training(2:2:end,:));
+            ClassifiedGroup2 = svmclassify(SVMStruct2,Training(2:2:end,:));
+            ClassifiedGroup3 = svmclassify(SVMStruct3,Training(2:2:end,:));
+            %% Form a consensus of the output of three classifiers
+            ClassifiedGroup = ClassifiedGroup1;
+            for it = 1:size(ClassifiedGroup1, 1)
+                if ClassifiedGroup1(i,1) == 1 && ClassifiedGroup2(i,1) == 0 && ClassifiedGroup3(i,1) == 0 
+                    ClassifiedGroup(i,1) = 1;
+                elseif ClassifiedGroup2(i,1) == 2 && ClassifiedGroup1(i,1) == 0 && ClassifiedGroup3(i,1) == 0
+                    ClassifiedGroup(i,1) = 2;
+                elseif ClassifiedGroup3(i,1) == 3 && ClassifiedGroup2(i,1) == 0 && ClassifiedGroup1(i,1) == 0
+                    ClassifiedGroup(i,1) = 3;
+                else
+                    ClassifiedGroup(i,1) = 0;
+                end
+                
+                
+            end
+            
+            %% Measure Accuracy
+            correct = find(ClassifiedGroup == Group(2:2:end,:));
+            accuracy = (length(correct)/length(ClassifiedGroup))*100;
+            classification_acc = [classification_acc, accuracy];
+            class_full = [class_full, ClassifiedGroup];
+            %% Check Trained SVM on training data
+            %ClassifiedGroup = svmclassify(SVMStruct,Training(1:2:end,:));
+            %% Measure Accuracy
+            correct = find(ClassifiedGroup == Group(2:2:end,:));
+            accuracy = (length(correct)/length(ClassifiedGroup))*100;
+            training_acc = [training_acc, accuracy]
+        end
+        classification_acc
+        [max_classification_acc, channel] = max(classification_acc);
+        min_classification_acc = min(classification_acc);
+        mean_classification_acc = mean(classification_acc);
+        best_channels = [best_channels, channel];
+        classification_accuracy_matrix = [classification_accuracy_matrix; classification_acc];
+%         pause
+        % %% Ensemble Learning
+        % sum_classified = sum(class_full, 2);
+        % ensemble_classification = zeros(size(class_full,1),1);
+        % for i = 1:size(sum_classified, 1)
+        %     if(sum_classified(i,1) > (num_channels/2))
+        %         ensemble_classification = 1;
+        %     else
+        %         ensemble_classification = 0;
+        %     end
+        % end
+        % correct = find(ensemble_classification == Group(2:2:end,:));
+        % ensemble_accuracy = (length(correct)/size(class_full,1))*100
+        % classification_acc
+        % training_acc
+    end
+end
+result_file = '_eeg_nostim_results100.mat';
+save(strcat(subjects{1,1}(2:4), result_file), 'classification_accuracy_matrix', 'best_channels')
+best_channels
+            
+	    
+	   
